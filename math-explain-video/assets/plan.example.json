@@ -1,0 +1,207 @@
+{
+  "schema": "math-explain-video/plan@1",
+  "problem": "证明：√2 是无理数。",
+  "problem_type": "proof",
+  "language": "zh",
+  "answer": "不存在整数 p、q（q ≠ 0）使 √2 = p/q，故 √2 为无理数。",
+  "theorem": "√2 ∉ ℚ",
+  "question": "为什么 √2 不能写成分数？",
+  "audience": "大学一年级 / 高中拔尖",
+  "target": { "width": 1920, "height": 1080, "fps": 30, "quality": "h" },
+  "source_method": {
+    "name": "TheoremExplainAgent (TIGER-AI-Lab, ACL 2025, MIT)",
+    "pipeline": "scene outline → 每场景三段计划（vision storyboard / technical implementation / animation+narration）→ Manim 代码 → 渲染与修复循环（v0 + 最多 5 次 fix）→ 合成",
+    "note": "本计划把源方法的三段式计划合并成一份 JSON；三段仍是分开写的字段，因为它们出错的原因不同。"
+  },
+  "review_criteria": [
+    {
+      "key": "accuracy_and_depth",
+      "ask": "解说说得对吗？有没有既严谨又给出「为什么成立」的直觉？",
+      "check": "逐式核对：p²=2q² 的每一步变形、互质条件的使用、结论与开头一致。"
+    },
+    {
+      "key": "logical_flow",
+      "ask": "结构是否清晰？概念是否层层递进？",
+      "check": "看接触表当分镜：陈述 → 假设 → 平方 → 矛盾 → 结论，每场景承接上一场景。"
+    },
+    {
+      "key": "visual_relevance",
+      "ask": "画面是否对应此刻正在推导的概念？",
+      "check": "每个场景抽帧：屏幕上的公式与解说词是同一件事，没有装饰性图形。"
+    },
+    {
+      "key": "element_layout",
+      "ask": "元素位置与大小是否得当？有无意外重叠？是否清晰？",
+      "check": "1:1 抽帧检查文字碰撞、出画、字号过小——这是机器生成 Manim 最常见的缺陷。"
+    },
+    {
+      "key": "visual_consistency",
+      "ask": "跨帧风格是否一致？运动与转场是否平滑？",
+      "check": "同一配色、同一标题栏、同一符号颜色含义；accent 色在全片只表示「现在看这里」。"
+    }
+  ],
+  "likert_anchors": {
+    "1": "Very poor quality, completely fails to meet the criteria.",
+    "2": "Below average, significant issues present.",
+    "3": "Acceptable, meets the basic criteria with minor issues.",
+    "4": "Good, performs well with no major issues.",
+    "5": "Excellent, fully meets or exceeds expectations."
+  },
+  "scenes": [
+    {
+      "id": "scene-01",
+      "title": "定理陈述",
+      "class": "Scene01Statement",
+      "file": "scenes/scene_01_statement.py",
+      "purpose": "一句话说清要证什么，并交代反证法这条路线。这是全片唯一的「问题」，后四场景都在回答它。",
+      "duration": 8,
+      "equation": "\\sqrt{2} \\notin \\mathbb{Q}",
+      "check": "结论式完整居中；「反证法」三个字出现在讲稿说到它之后，不能提前出现。",
+      "vision": {
+        "layout": "标题栏在上；结论式居中偏上（y≈+0.8）；下方留出反证法提示的位置（y≈-1.6），为下一场景的假设式预留视线落点。",
+        "elements": ["标题栏（章节号 01 + 定理陈述）", "结论式 MathTex", "反证法提示 Text（accent 色）"],
+        "reading_order": "标题 → 结论式 → 提示",
+        "palette": { "结论式": "INK", "提示": "ACCENT" }
+      },
+      "technical": {
+        "objects": ["VGroup(title_bar)", "MathTex(r'\\sqrt{2} \\notin \\mathbb{Q}', font_size=64)", "Text('反证法：先假设它是有理数', font_size=30)"],
+        "vgroup": "claim 单独一组；strategy 单独一组；两者用 next_to 关联，不写绝对坐标。",
+        "animations": ["FadeIn(title_bar, run_time=0.6)", "Write(claim, run_time=1.6)", "FadeIn(strategy, shift=UP*0.2, run_time=0.8)", "Indicate(claim, color=ACCENT, run_time=0.8)"],
+        "waits": ["0.4s 标题后", "1.0s 结论式后", "1.8s 提示后", "1.2s 收尾"],
+        "latex_packages": ["amssymb（\\notin、\\mathbb）"],
+        "notes": "字号 64 的单个短公式安全；若换成带分式的长式必须拆行。"
+      },
+      "narration": {
+        "script": "我们要证明根号二是无理数，也就是它不能写成两个整数之比。直接去证很难，所以我们反过来：先假设它可以写成比值，看看会推出什么。",
+        "cues": ["标题淡入", "结论式写下", "提示淡入并强调结论式"]
+      }
+    },
+    {
+      "id": "scene-02",
+      "title": "反证假设",
+      "class": "Scene02Assumption",
+      "file": "scenes/scene_02_assumption.py",
+      "purpose": "把假设写成最简分数形式，并把「p、q 互质」单独强调——它是后面矛盾的唯一来源。",
+      "duration": 10,
+      "equation": "\\sqrt{2} = \\frac{p}{q}, \\quad \\gcd(p, q) = 1",
+      "check": "互质条件必须被框选强调；q ≠ 0 不能漏。",
+      "vision": {
+        "layout": "假设式在中上（y≈+1.0）；互质条件在下方（y≈-0.8）并加 accent 色矩形框；不与标题栏重叠。",
+        "elements": ["标题栏", "假设式 MathTex", "互质条件 Text", "SurroundingRectangle 强调框"],
+        "reading_order": "假设式 → 互质框",
+        "palette": { "假设式": "INK", "互质条件与框": "ACCENT" }
+      },
+      "technical": {
+        "objects": ["MathTex(r'\\sqrt{2} = \\frac{p}{q}', font_size=64)", "Text('p、q 互质，q ≠ 0', font_size=32)", "SurroundingRectangle(coprime, color=ACCENT, buff=0.18)"],
+        "vgroup": "coprime 与 box 合成一组再 next_to(assumption, DOWN, buff=0.8)。",
+        "animations": ["Write(assumption, run_time=1.4)", "FadeIn(group, run_time=0.8)", "Circumscribe(coprime, run_time=1.0)"],
+        "waits": ["0.8s", "1.0s", "1.6s 收尾"],
+        "latex_packages": ["amssymb（\\gcd）"],
+        "notes": "中文与数学符号不要混进同一个 MathTex；「互质」用 Text，数学用 MathTex。"
+      },
+      "narration": {
+        "script": "假设根号二等于 p 比 q，其中 p、q 是整数，q 不为零；而且我们要求这个分数已经约到最简，也就是 p 和 q 互质。请记住这个条件，后面的矛盾全靠它。",
+        "cues": ["假设式写入", "互质条件淡入", "框选并强调"]
+      }
+    },
+    {
+      "id": "scene-03",
+      "title": "平方与整除",
+      "class": "Scene03Square",
+      "file": "scenes/scene_03_square.py",
+      "purpose": "由假设推出 p² = 2q²，再推出 p 是偶数。这一步是全片的技术核心。",
+      "duration": 12,
+      "equation": "p^2 = 2q^2 \\Rightarrow p = 2k",
+      "check": "两行变形都必须可追溯；不得跳步；p 为偶数要单独成行。",
+      "vision": {
+        "layout": "从上一步的式子出发，逐行向下累加（每行 buff=0.45）；最后一行用 accent 色；左侧留白给「为什么」的一句注释，控制在 ±7.0 以内。",
+        "elements": ["标题栏", "变形第 1 行 MathTex", "变形第 2 行 MathTex（accent）", "注释 Text"],
+        "reading_order": "第 1 行 → 第 2 行 → 注释",
+        "palette": { "第 1 行": "INK", "第 2 行": "ACCENT", "注释": "DIM" }
+      },
+      "technical": {
+        "objects": ["MathTex(r'p^2 = 2q^2', font_size=56)", "MathTex(r'p = 2k', font_size=56)", "Text('偶数平方才是偶数', font_size=24)"],
+        "vgroup": "VGroup(line1, line2).arrange(DOWN, buff=0.45).next_to(title_bar, DOWN, buff=0.6)",
+        "animations": ["Write(line1, run_time=1.4)", "FadeIn(note, run_time=0.6)", "Write(line2, run_time=1.2)", "Indicate(line2, color=ACCENT, run_time=0.8)"],
+        "waits": ["0.8s", "1.0s", "1.0s", "1.5s"],
+        "latex_packages": [],
+        "notes": "三行文字加标题栏接近安全边界，字号从 56 起，不要超过 64。"
+      },
+      "narration": {
+        "script": "两边平方，得到 p 平方等于二倍 q 平方。这说明 p 平方是偶数；而只有偶数的平方才是偶数，所以 p 本身必须是偶数，于是可以写成 p 等于 2k。",
+        "cues": ["第一行写入", "注释淡入", "第二行写入并强调"]
+      }
+    },
+    {
+      "id": "scene-04",
+      "title": "导出矛盾",
+      "class": "Scene04Contradiction",
+      "file": "scenes/scene_04_contradiction.py",
+      "purpose": "代回得到 q 也是偶数，与场景二的互质条件正面冲突——矛盾的两端必须同屏。",
+      "duration": 14,
+      "equation": "q = 2m \\quad \\text{与} \\quad \\gcd(p, q) = 1 \\quad \\text{矛盾}",
+      "check": "互质条件必须在本场景重新出现并与结论同屏，不能要求观众回忆场景二。",
+      "vision": {
+        "layout": "上半屏放推导（代回与 q 为偶数），下半屏左放「p、q 均为偶数」、右放「互质」旧条件，两者用同色高亮；中间留 0.3 单位以上间距。",
+        "elements": ["标题栏", "代回计算 MathTex", "结论 MathTex", "旧条件 MathTex（复现）", "矛盾强调框"],
+        "reading_order": "上半推导 → 下半左 → 下半右 → 冲突框",
+        "palette": { "推导": "INK", "两端冲突": "ACCENT" }
+      },
+      "technical": {
+        "objects": ["MathTex(r'2q^2 = (2k)^2 \\Rightarrow q = 2m', font_size=48)", "MathTex(r'p = 2k,\\ q = 2m', font_size=52)", "MathTex(r'\\gcd(p, q) = 1', font_size=52)", "SurroundingRectangle(VGroup(left, right), color=ACCENT)"],
+        "vgroup": "left 与 right 用 VGroup(...).arrange(RIGHT, buff=1.2) 并置，整体置于下半屏。",
+        "animations": ["Write(derive, run_time=1.6)", "FadeIn(left, run_time=0.6)", "FadeIn(right, run_time=0.6)", "Create(clash_box, run_time=0.8)"],
+        "waits": ["1.0s", "0.6s", "0.6s", "1.8s 停顿让矛盾落地"],
+        "latex_packages": ["amssymb"],
+        "notes": "这场景元素最多，最容易发生重叠：先排下半屏两组，再确认与上半屏推导的间距 ≥ 0.3。"
+      },
+      "narration": {
+        "script": "把 p 等于 2k 代回去，得到 q 平方等于 2k 平方，同样的道理，q 也是偶数。可是 p、q 都是偶数，它们就有公因数 2，这和「p、q 互质」直接冲突。假设本身崩了。",
+        "cues": ["代回计算写入", "左侧结论淡入", "右侧旧条件淡入", "冲突框闭合"]
+      }
+    },
+    {
+      "id": "scene-05",
+      "title": "结论",
+      "class": "Scene05Conclusion",
+      "file": "scenes/scene_05_conclusion.py",
+      "purpose": "收束反证：假设不成立，故 √2 无理；回扣开场结论式。",
+      "duration": 9,
+      "equation": "\\therefore \\sqrt{2} \\notin \\mathbb{Q}",
+      "check": "最后一帧必须含结论，而不是上一步的推导；结尾回扣场景一的公式。",
+      "vision": {
+        "layout": "结论式回到场景一的同一位置（视觉对称），下方三行小结：假设 → 矛盾 → 否定假设。",
+        "elements": ["标题栏", "结论式 MathTex（与场景一位置一致）", "反证法结构小结 VGroup"],
+        "reading_order": "结论式 → 小结",
+        "palette": { "结论式": "INK（Indicate 时用 ACCENT）", "小结": "DIM" }
+      },
+      "technical": {
+        "objects": ["MathTex(r'\\therefore \\sqrt{2} \\notin \\mathbb{Q}', font_size=64)", "VGroup 三行 Text"],
+        "vgroup": "小结三行 arrange(DOWN, aligned_edge=LEFT, buff=0.3)，整体 next_to(claim, DOWN, buff=1.0)。",
+        "animations": ["Write(claim, run_time=1.4)", "Indicate(claim, color=ACCENT, run_time=0.8)", "FadeIn(summary, run_time=0.8)"],
+        "waits": ["1.0s", "0.6s", "2.0s 收尾留白"],
+        "latex_packages": ["amssymb"],
+        "notes": "结尾留白是刻意的：给观众合上结论的时间。"
+      },
+      "narration": {
+        "script": "假设推出了矛盾，所以假设不成立。根号二不能写成两个整数之比，因此它是无理数。这就是反证法：假设、推导、矛盾、否定。",
+        "cues": ["结论式写入并强调", "小结淡入", "结尾留白"]
+      }
+    }
+  ],
+  "assembly": {
+    "order": ["scene-01", "scene-02", "scene-03", "scene-04", "scene-05"],
+    "planned_total_seconds": 53,
+    "tolerance": 0.25,
+    "audio": null,
+    "subtitles": null,
+    "out": "out/final.mp4"
+  },
+  "notes": [
+    "三段式字段（vision / technical / narration）分开写：视觉错在布局，技术错在 API，讲稿错在表述，混在一起就无法定位。",
+    "duration 是渲染前的目标值；渲染后用 check_video.py 读实际时长，比率超出 tolerance 就回改场景或讲稿。",
+    "equation 字段是 LaTeX 片段，直接进入 MathTex；含中文的部分一律用 Text，不要塞进 MathTex。",
+    "cues 是场景内的节拍清单，逐一对应 self.play/self.wait，保证动画不抢讲稿。",
+    "本技能可以用 DSH 的 TTS 插件合成讲稿（scripts/tts_narration.py，需要桌面应用在运行）；有语音轨时用 assemble.py --audio 混入，没有可用路由时退回字幕交付（--burn-subs），不要为此卡住成片。"
+  ]
+}

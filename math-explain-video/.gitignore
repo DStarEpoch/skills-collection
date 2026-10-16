@@ -1,0 +1,22 @@
+# render artifacts and caches (the package itself is all source)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# per-project outputs people create while using the skill
+out/
+media/
+*.mp4
+*.srt
+*.mp3
+
+# the self-test's throwaway example output
+examples/*/out/
+examples/*/manim-media/
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

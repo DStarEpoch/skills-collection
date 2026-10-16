@@ -1,0 +1,81 @@
+{
+  "schema": "math-explain-video/plan@1",
+  "problem": "演示包的端到端流程：前 n 个奇数之和等于 n²。",
+  "problem_type": "worked_problem",
+  "language": "zh",
+  "answer": "前 n 个奇数之和等于 n²；n = 4 时 1+3+5+7 = 16 = 4²。",
+  "theorem": "1 + 3 + 5 + ⋯ + (2n−1) = n²",
+  "question": "前 n 个奇数加起来是多少？",
+  "audience": "初中 / 任何第一次用这个包的人",
+  "target": { "width": 1920, "height": 1080, "fps": 30, "quality": "h" },
+  "note": "这是 examples/tiny —— 一个两场的玩具片，唯一目的是让 scripts/selftest.py 能在任何机器上验证整条流水线（渲染 → 检查 → 字幕 → 合成）。它不是教学范例，内容刻意做到可以一眼验算。",
+  "scenes": [
+    {
+      "id": "scene-01",
+      "title": "把奇数配成平方",
+      "class": "Scene01Sum",
+      "file": "scenes/scene_01_sum.py",
+      "clip": "scene-01.mp4",
+      "purpose": "先给一个具体的和，让观众有可以自己验算的对象。",
+      "duration": 7.0,
+      "equation": "1 + 3 + 5 + 7 = 16",
+      "check": "画面上的和必须等于 16，且四个加数都是奇数。",
+      "vision": {
+        "layout": "标题栏在上；和式居中；说明一行在其下方；右下角标出四步。",
+        "elements": ["标题栏", "和式 MathTex", "说明 Text", "四个奇数的小方块"],
+        "reading_order": "和式 → 四个加数逐个亮起 → 说明",
+        "palette": { "和式": "INK", "当前加数": "ACCENT" }
+      },
+      "technical": {
+        "objects": ["VGroup(title_bar)", "MathTex(r'1 + 3 + 5 + 7 = 16', font_size=56)", "Text('前 4 个奇数', font_size=26)"],
+        "vgroup": "说明 next_to(和式, DOWN, buff=0.8)；整体居中，不写绝对坐标。",
+        "animations": ["FadeIn(title_bar, 0.6)", "Write(claim, 1.2)", "FadeIn(caption, 0.7)", "Indicate(claim, ACCENT, 0.8)"],
+        "waits": ["0.4s", "0.8s", "2.5s"],
+        "latex_packages": [],
+        "notes": "公式短，字号 56 安全。"
+      },
+      "narration": {
+        "script": "先看一个具体的例子：前四个奇数相加，一加三加五加七，等于十六。",
+        "cues": ["标题淡入", "和式写下", "说明淡入并强调"]
+      }
+    },
+    {
+      "id": "scene-02",
+      "title": "一般情形：n 的平方",
+      "class": "Scene02Square",
+      "file": "scenes/scene_02_square.py",
+      "clip": "scene-02.mp4",
+      "purpose": "把具体例子提升为恒等式，并回代验证。",
+      "duration": 8.0,
+      "equation": "1 + 3 + \\cdots + (2n-1) = n^2",
+      "check": "回代 n = 4 必须得到 16 = 4²，与场景一一致。",
+      "vision": {
+        "layout": "恒等式居中偏上；回代一行在其下方（accent 色）。",
+        "elements": ["标题栏", "恒等式 MathTex", "回代 MathTex（ACCENT）"],
+        "reading_order": "恒等式 → 回代验证",
+        "palette": { "恒等式": "INK", "回代": "ACCENT" }
+      },
+      "technical": {
+        "objects": ["VGroup(title_bar)", "MathTex(r'1 + 3 + \\cdots + (2n-1) = n^2', font_size=52)", "MathTex(r'n = 4:\\quad 16 = 4^2', font_size=44, color=ACCENT)"],
+        "vgroup": "两式用 next_to 关联，整体 move_to(UP*0.6)。",
+        "animations": ["FadeIn(title_bar, 0.6)", "Write(identity, 1.4)", "Write(check, 1.2)", "Indicate(check, ACCENT, 0.9)"],
+        "waits": ["0.4s", "1.0s", "0.8s", "2.6s"],
+        "latex_packages": ["amsmath"],
+        "notes": "结尾留白，让回代的结果落地。"
+      },
+      "narration": {
+        "script": "把例子写成一般情形：前 n 个奇数之和等于 n 的平方。回代 n 等于四，正好是十六。",
+        "cues": ["标题淡入", "恒等式写入", "回代写入并强调"]
+      }
+    }
+  ],
+  "assembly": {
+    "order": ["scene-01", "scene-02"],
+    "planned_total_seconds": 15.0,
+    "tolerance": 0.25,
+    "audio": null,
+    "subtitles": "out/subtitles.srt",
+    "sub_font": "",
+    "out": "out/tiny.mp4"
+  }
+}
