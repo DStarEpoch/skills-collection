@@ -120,6 +120,11 @@ for all-green (0)**.
 
 ## 6. Changes and teardown
 
+- **Confine yourself to ~/ops**: every temp script, log, scratch file, and env pin an
+  agent creates lives under `~/ops` (or the declared evidence root) — never directly in
+  `$HOME` or another program's directory. Conversely, **never delete, move, or modify
+  anything outside `~/ops` unless you created it in this run**: other processes' logs and
+  state are not yours to touch. When in doubt, leave it.
 - **Teardown: inventory first, approval second** — list what gets deleted, what stays,
   where the evidence is; irreversible actions need explicit authorization.
 - Pinned release identity: production runs only the pinned release unit (manifest+SHA);
