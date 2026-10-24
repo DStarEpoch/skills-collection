@@ -138,6 +138,11 @@ for all-green (0)**.
   (upgrade → verify → teardown → restart), carry it to completion without pausing.
 - **Explicit human gates**: points needing human judgment become attestations — prepare
   the evidence package, the human confirms.
+- **1-hour self-fix rule**: if an issue written into the handoff document is not fixed by
+  another agent within 1 hour, and it blocks the project's normal operation (close, data
+  integrity, safety), fix it yourself in an isolated branch/worktree, test, build+verify,
+  and record the result in the handoff doc. Never let the project stall waiting for
+  another agent. Alert-noise-only issues still belong to the coder, not this rule.
 - **N unanswered calls → decide only within the pre-authorized scope** (default N=3),
   and record it honestly. **No response never grants new authority**: a count cannot
   bypass a human gate; irreversible actions, scope expansion, and writer/lease judgments
